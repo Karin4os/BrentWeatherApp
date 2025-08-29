@@ -1,14 +1,15 @@
 import streamlit as st
 import pandas as pd
-import sqlite3
+from sqlalchemy import create_engine
 from prophet import Prophet
 
 # Load data
-DB_PATH = "data/data.db"  # path inside /app in container
-# DB_PATH = "../data/data.db"
-conn = sqlite3.connect(DB_PATH)
-prices = pd.read_sql("SELECT * FROM commodity_prices", conn)
-weather = pd.read_sql("SELECT * FROM weather_data", conn)
+POSTGRES_CONN_STR = (
+    "postgresql+psycopg2://airflow:airflow_postg_pwd@postgres:5432/airflow"
+)
+engine = create_engine(POSTGRES_CONN_STR)
+prices = pd.read_sql("SELECT * FROM commodity_prices", engine)
+weather = pd.read_sql("SELECT * FROM weather_data", engine)
 
 st.title("📈 Commodity Prices & Weather Impact")
 

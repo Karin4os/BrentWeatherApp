@@ -1,3 +1,5 @@
 streamlit
 pandas
 prophet
+sqlalchemy
+psycopg2-binary

@@ -3,11 +3,13 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import pandas as pd
 import requests
-import sqlite3
+from sqlalchemy import create_engine
 import openpyxl
 import io
 
-DB_PATH = "/opt/airflow/data/data.db"
+POSTGRES_CONN_STR = (
+    "postgresql+psycopg2://airflow:airflow_postg_pwd@postgres:5432/airflow"
+)
 
 
 def fetch_prices():
@@ -55,9 +57,8 @@ def fetch_prices():
                 continue
 
     data_df = pd.DataFrame(data)
-    conn = sqlite3.connect(DB_PATH)
-    data_df.to_sql("commodity_prices", conn, if_exists="replace", index=False)
-    conn.close()
+    engine = create_engine(POSTGRES_CONN_STR)
+    data_df.to_sql("commodity_prices", engine, if_exists="replace", index=False)
 
 
 def fetch_weather():
@@ -71,9 +72,8 @@ def fetch_weather():
             "precip": data["daily"]["precipitation_sum"],
         }
     )
-    conn = sqlite3.connect(DB_PATH)
-    df.to_sql("weather_data", conn, if_exists="replace", index=False)
-    conn.close()
+    engine = create_engine(POSTGRES_CONN_STR)
+    df.to_sql("weather_data", engine, if_exists="replace", index=False)
 
 
 default_args = {
