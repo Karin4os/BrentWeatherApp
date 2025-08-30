@@ -31,7 +31,7 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           passphrase: ${{ secrets.DO_SSH_PASSPHRASE }}
           script: |
-            cd ~/yourproject
+            cd /root/project/commodity-weather/
             git pull origin main
             docker compose pull streamlit
             docker compose up -d streamlit
