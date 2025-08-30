@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and push Streamlit image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/streamlit-app:latest ./streamlit
+          docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/streamlit-app:latest ./streamlit
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/streamlit-app:latest
 
       - name: Deploy to DigitalOcean droplet
