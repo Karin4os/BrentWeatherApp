@@ -1,0 +1,36 @@
+name: CI/CD Streamlit
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Streamlit image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/streamlit-app:latest ./streamlit
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/streamlit-app:latest
+
+      - name: Deploy to DigitalOcean droplet
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            cd ~/yourproject
+            git pull origin main
+            docker compose pull streamlit
+            docker compose up -d streamlit
